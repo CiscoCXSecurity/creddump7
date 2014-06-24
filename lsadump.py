@@ -29,6 +29,14 @@ from framework.win32.lsasecrets import get_file_secrets
 
 FILTER=''.join([(len(repr(chr(x)))==3) and chr(x) or '.' for x in range(256)])
 
+def showUsage():
+    print "usage: %s <system hive> <security hive> <Vista/7>" % sys.argv[0]
+    print "\nExample (Windows Vista/7):"
+    print "%s /path/to/System32/config/SYSTEM /path/to/System32/config/SECURITY true" % sys.argv[0]
+    print "\nExample (Windows XP):"
+    print "%s /path/to/System32/SYSTEM /path/to/System32/config/SECURITY false" % sys.argv[0]
+
+
 def dump(src, length=8):
     N=0; result=''
     while src:
@@ -39,9 +47,11 @@ def dump(src, length=8):
        N+=length
     return result
 
-if len(sys.argv) < 3:
-    print "usage: %s <system hive> <security hive>" % sys.argv[0]
+if len(sys.argv) < 4 or sys.argv[3] not in ["true", "false"]:
+    showUsage()
     sys.exit(1)
+else:
+    vista = True if sys.argv[3] == "true" else False
 
 secrets = get_file_secrets(sys.argv[1], sys.argv[2])
 if not secrets:
