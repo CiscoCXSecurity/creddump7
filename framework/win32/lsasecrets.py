@@ -22,15 +22,19 @@
 from framework.win32.rawreg import *
 from framework.addrspace import HiveFileAddressSpace
 from framework.win32.hashdump import get_bootkey,str_to_key
-from Crypto.Hash import MD5
-from Crypto.Cipher import ARC4,DES
+from Crypto.Hash import MD5, SHA256
+from Crypto.Cipher import ARC4,DES, AES
 
-def get_lsa_key(secaddr, bootkey):
+def get_lsa_key(secaddr, bootkey, vista):
     root = get_root(secaddr)
     if not root:
         return None
 
-    enc_reg_key = open_key(root, ["Policy", "PolSecretEncryptionKey"])
+    if vista:
+        enc_reg_key = open_key(root, ["Policy", "PolEKList"])
+    else:
+        enc_reg_key = open_key(root, ["Policy", "PolSecretEncryptionKey"])
+
     if not enc_reg_key:
         return None
 
@@ -43,16 +47,20 @@ def get_lsa_key(secaddr, bootkey):
     if not obf_lsa_key:
         return None
 
-    md5 = MD5.new()
-    md5.update(bootkey)
-    for i in range(1000):
-        md5.update(obf_lsa_key[60:76])
-    rc4key = md5.digest()
+    if not vista:
+        md5 = MD5.new()
+        md5.update(bootkey)
+        for i in range(1000):
+            md5.update(obf_lsa_key[60:76])
+        rc4key = md5.digest()
+        rc4 = ARC4.new(rc4key)
+        lsa_key = rc4.decrypt(obf_lsa_key[12:60])
+        lsa_key = lsa_key[0x10:0x20]
+    else:
+        lsa_key = decrypt_aes(obf_lsa_key, bootkey)
+        lsa_key = lsa_key[68:100]
 
-    rc4 = ARC4.new(rc4key)
-    lsa_key = rc4.decrypt(obf_lsa_key[12:60])
-
-    return lsa_key[0x10:0x20]
+    return lsa_key
 
 def decrypt_secret(secret, key):
     """Python implementation of SystemFunction005.
@@ -76,7 +84,26 @@ def decrypt_secret(secret, key):
     (dec_data_len,) = unpack("<L", decrypted_data[:4])
     return decrypted_data[8:8+dec_data_len]
 
-def get_secret_by_name(secaddr, name, lsakey):
+def decrypt_aes(secret, key):
+    sha = SHA256.new()
+    sha.update(key)
+    for _i in range(1, 1000+1):
+        sha.update(secret[28:60])
+    aeskey = sha.digest()
+
+    data = ""
+    for i in range(60, len(secret), 16):
+        aes = AES.new(aeskey, AES.MODE_CBC, "\x00"*16)
+        buf = secret[i : i + 16]
+        if len(buf) < 16:
+            buf += (16-len(buf)) * "\00"
+
+        data += aes.decrypt(buf)
+
+    return data
+
+
+def get_secret_by_name(secaddr, name, lsakey, vista):
     root = get_root(secaddr)
     if not root:
         return None
@@ -94,15 +121,20 @@ def get_secret_by_name(secaddr, name, lsakey):
     if not enc_secret:
         return None
 
-    return decrypt_secret(enc_secret[0xC:], lsakey)
+    if vista:
+        secret = decrypt_aes(enc_secret, lsakey)
+    else:
+        secret = decrypt_secret(enc_secret[0xC:], lsakey)
 
-def get_secrets(sysaddr, secaddr):
+    return secret
+
+def get_secrets(sysaddr, secaddr, vista):
     root = get_root(secaddr)
     if not root:
         return None
 
     bootkey = get_bootkey(sysaddr)
-    lsakey = get_lsa_key(secaddr, bootkey)
+    lsakey = get_lsa_key(secaddr, bootkey, vista)
 
     secrets_key = open_key(root, ["Policy", "Secrets"])
     if not secrets_key:
@@ -123,13 +155,17 @@ def get_secrets(sysaddr, secaddr):
         if not enc_secret:
             continue
 
-        secret = decrypt_secret(enc_secret[0xC:], lsakey)
+        if vista:
+            secret = decrypt_aes(enc_secret, lsakey)
+        else:
+            secret = decrypt_secret(enc_secret[0xC:], lsakey)
+
         secrets[key.Name] = secret
 
     return secrets
 
-def get_file_secrets(sysfile, secfile):
+def get_file_secrets(sysfile, secfile, vista):
     sysaddr = HiveFileAddressSpace(sysfile)
     secaddr = HiveFileAddressSpace(secfile)
 
-    return get_secrets(sysaddr, secaddr)
+    return get_secrets(sysaddr, secaddr, vista)

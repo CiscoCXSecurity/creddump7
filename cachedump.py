@@ -26,7 +26,7 @@ import sys
 from framework.win32.domcachedump import dump_file_hashes
 
 if len(sys.argv) < 3:
-    print "usage: %s <system hive> <security hive>" % sys.argv[0]
+    print "usage: %s <system hive> <security hive> <vista>" % sys.argv[0]
     sys.exit(1)
 
-dump_file_hashes(sys.argv[1], sys.argv[2])
+dump_file_hashes(sys.argv[1], sys.argv[2], sys.argv[3])
