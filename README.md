@@ -14,6 +14,10 @@ I followed patches and fixes from the following links:
 * https://code.google.com/p/creddump/issues/detail?id=4
 * https://code.google.com/p/volatility/issues/detail?id=92
 
+Enjoy!
+Ronnie Flathers (@ropnop)
+
+
 ##Usage
 Mount a Windows 7/Vista partition:
     # mkdir /mnt/win
@@ -41,7 +45,6 @@ If you want to crack the hashes and have a good wordlist, John can be used. The 
 
 We now have the passwords for two domain users. Note: these passwords are really simple and I knew they were in the wordlist I used. Normally if you want to actually bruteforce the passwords, I wouldn't recommend John. Pull the hashes and use a GPU powered cracking box with oclHashcat.
 
-- Ronnie Flathers (@ropnop)
 
 ####Below is the original README file
 
