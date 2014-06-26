@@ -18,10 +18,12 @@ Enjoy!
 Ronnie Flathers (@ropnop)
 
 
-##Usage
+###Usage
 Mount a Windows 7/Vista partition:
-    # mkdir /mnt/win
-    # ntfs-3g /dev/sda1 /mnt/win
+```
+# mkdir /mnt/win
+# ntfs-3g /dev/sda1 /mnt/win
+```
 
 Run cachedump.py on the SYSTEM and SECURITY hives to extract cached domain creds:
 ```
