@@ -53,7 +53,7 @@ if len(sys.argv) < 4 or sys.argv[3] not in ["true", "false"]:
 else:
     vista = True if sys.argv[3] == "true" else False
 
-secrets = get_file_secrets(sys.argv[1], sys.argv[2])
+secrets = get_file_secrets(sys.argv[1], sys.argv[2], vista)
 if not secrets:
     print "Unable to read LSA secrets. Perhaps you provided invalid hive files?"
     sys.exit(1)
