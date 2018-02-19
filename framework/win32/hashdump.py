@@ -189,7 +189,7 @@ def decrypt_single_salted_hash(rid, hbootkey, enc_hash, lmntstr, salt):
     (des_k1,des_k2) = sid_to_key(rid)
     d1 = DES.new(des_k1, DES.MODE_ECB)
     d2 = DES.new(des_k2, DES.MODE_ECB)
-    cipher = AES.new(hbootkey, AES.MODE_CBC, salt)
+    cipher = AES.new(hbootkey[:16], AES.MODE_CBC, salt)
     obfkey = cipher.decrypt(enc_hash)
     hash = d1.decrypt(obfkey[:8]) + d2.decrypt(obfkey[8:16])
 
