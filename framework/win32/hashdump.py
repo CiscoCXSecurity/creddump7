@@ -256,7 +256,7 @@ def dump_hashes(sysaddr, samaddr):
         lmhash,nthash = get_user_hashes(user,hbootkey)
         if not lmhash: lmhash = empty_lm
         if not nthash: nthash = empty_nt
-        print "%s:%d:%s:%s:::" % (get_user_name(user), int(user.Name,16),
+        print "%s:%d:%s:%s:::" % (get_user_name(user).encode("utf-8"), int(user.Name,16),
                             lmhash.encode('hex'), nthash.encode('hex'))
 
 def dump_file_hashes(syshive_fname, samhive_fname):
