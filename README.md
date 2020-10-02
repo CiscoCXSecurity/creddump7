@@ -1,4 +1,4 @@
-#Information
+# Information
 This repo is for my modifications to the original 'creddump' program available
 at: 
 
@@ -18,7 +18,7 @@ Enjoy!
 Ronnie Flathers (@ropnop)
 
 
-###Usage
+### Usage
 Mount a Windows 7/Vista partition:
 ```
 # mkdir /mnt/win
@@ -52,9 +52,9 @@ Welcome1!        (nharpsis)
 We now have the passwords for two domain users. Note: these passwords are really simple and I knew they were in the wordlist I used. Normally if you want to actually bruteforce the passwords, I wouldn't recommend John. Pull the hashes and use a GPU powered cracking box with oclHashcat.
 
 
-####Below is the original README file
+#### Below is the original README file
 
-
+```
 OVERVIEW
 
 creddump is a python tool to extract various credentials and secrets from
@@ -180,3 +180,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
